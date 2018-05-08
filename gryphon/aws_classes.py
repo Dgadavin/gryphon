@@ -179,7 +179,6 @@ class Cluster:
         logger.info("Starting retrieving tasks list")
 
         task_keys = list_all_children(ecs.list_tasks, 'taskArns', cluster=self.name)
-        print('keys length:', len(task_keys))
         if not task_keys:
             return
 
