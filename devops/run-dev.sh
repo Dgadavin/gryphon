@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -eux
 docker run \
-	--net="host" \
+    -p 3000:3000 \
+    -e AWS_DEFAULT_PROFILE=glomex \
 	-e DEBUG="1" \
-	-e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-	-e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-	-e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION \
+	-e AWS_DEFAULT_REGION=eu-west-1 \
 	-v "$(dirname "$(pwd)")":/web-server/ \
+	-v ~/.aws:/root/.aws \
 	-w /web-server/gryphon -i -t -P gryphon

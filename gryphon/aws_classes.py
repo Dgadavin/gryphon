@@ -177,13 +177,16 @@ class Cluster:
         container_defs = {}
 
         logger.info("Starting retrieving tasks list")
-        task_keys = list_all_children(ecs.list_tasks, 'taskArns', cluster=self.name)
 
+        task_keys = list_all_children(ecs.list_tasks, 'taskArns', cluster=self.name)
+        print('keys length:', len(task_keys))
         if not task_keys:
             return
 
-        logger.info("Describes tasks")
-        task_info = ecs.describe_tasks(cluster=self.name, tasks=task_keys)['tasks']
+        task_keys_chunks = [task_keys[i:i+100] for i in range(0, len(task_keys), 100)]
+        task_info = []
+        for task_keys in task_keys_chunks:
+            task_info.extend(ecs.describe_tasks(cluster=self.name, tasks=task_keys)['tasks'])
         cont_inst_arn = defaultdict(list)
         task_dict = defaultdict(list)
 
