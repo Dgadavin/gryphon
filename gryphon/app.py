@@ -78,14 +78,16 @@ def stop_task(cluster_name, task_arn):
 
 @app.route("/cli/exec/<cluster_name>/<container>")
 def cli_exec(cluster_name, container):
+    base_url = os.getenv('BASEURL')
+    print(base_url)
     task_arn, ip = get_exec_info(cluster_name, container)
     if not(task_arn and ip):
         return 'echo "Cluster or Container not found (Did you mistype?)"'
 
     command = 'set -eux;\n' \
               'containerName="' + container + '";\n' + \
-              'taskArn=' + task_arn + ';\n' +\
-              'dockerCommand="CONTAINER_ID=\\`curl http://localhost:51678/v1/tasks?taskarn=${taskArn} | jq -r \\".Containers[] | select(.Name==\\\\\\"${containerName}\\\\\\").DockerId\\"\\`; sudo docker exec -it -u root \\${CONTAINER_ID} bash";\n' +\
+              'taskArn=' + task_arn + ';\n' + \
+              'dockerCommand="CONTAINER_ID=\\`curl {}/v1/tasks?taskarn=${taskArn} | jq -r \\".Containers[] | select(.Name==\\\\\\"${containerName}\\\\\\").DockerId\\"\\`; sudo docker exec -it -u root \\${CONTAINER_ID} bash";\n'.format(base_url) +\
               'ssh ' + ip + ' -t "set -ex; $dockerCommand"'
     return command
 
